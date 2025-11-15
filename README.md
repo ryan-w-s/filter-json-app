@@ -59,11 +59,11 @@ bun run test:rust
 ## Tech Stack
 
 - Tauri
-- SvelteKit
+- SvelteKit - v5, so it has the new rune syntax
 - TypeScript
 - Rust
 - Bun
-- TailwindCSS
+- TailwindCSS - v4
 - ESLint
 - Vitest
 
