@@ -7,7 +7,7 @@ import globals from "globals"
 export default [
   // Ignore SvelteKit's generated output; we only want to lint our source
   {
-    ignores: ["**/.svelte-kit/**"],
+    ignores: ["**/.svelte-kit/**", "src-tauri/target/**"],
   },
 
   js.configs.recommended,

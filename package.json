@@ -13,7 +13,10 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "tauri": "tauri"
+    "test:rust": "cargo test --manifest-path src-tauri/Cargo.toml",
+    "tauri": "tauri",
+    "sanity": "bun run lint:fix && bun run test && bun run test:rust",
+    "sync:agents": "cp README.md AGENTS.md"
   },
   "license": "MIT",
   "dependencies": {
