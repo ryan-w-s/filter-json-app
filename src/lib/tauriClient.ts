@@ -28,7 +28,13 @@ export async function openJsonFile(): Promise<string | null> {
   // Prefer modern File System Access API if available
   const anyWindow = window as unknown as {
     showOpenFilePicker?: (
-      options?: FilePickerOptions,
+      options?: {
+        types?: {
+          description?: string
+          accept: Record<string, string[]>
+        }[]
+        multiple?: boolean
+      },
     ) => Promise<FileSystemFileHandle[]>
   }
 
@@ -67,7 +73,65 @@ export async function openJsonFile(): Promise<string | null> {
   })
 }
 
+type SaveFilePickerOptions = {
+  suggestedName?: string
+  types?: {
+    description?: string
+    accept: Record<string, string[]>
+  }[]
+}
+
+type FileSystemWritableFileStreamLike = {
+  write(data: string): Promise<void>
+  close(): Promise<void>
+}
+
+type FileSystemFileHandleLike = {
+  createWritable(): Promise<FileSystemWritableFileStreamLike>
+}
+
+async function saveTextWithPicker(
+  content: string,
+  suggestedName: string,
+): Promise<boolean> {
+  const anyWindow = window as unknown as {
+    showSaveFilePicker?: (
+      options?: SaveFilePickerOptions,
+    ) => Promise<FileSystemFileHandleLike>
+  }
+
+  if (!anyWindow.showSaveFilePicker) {
+    return false
+  }
+
+  try {
+    const handle = await anyWindow.showSaveFilePicker({
+      suggestedName,
+      types: [
+        {
+          description: "JSON Files",
+          accept: { "application/json": [".json"] },
+        },
+      ],
+    })
+    const writable = await handle.createWritable()
+    await writable.write(content)
+    await writable.close()
+    return true
+  } catch (error) {
+    // If the user cancels the dialog, do not fall back to automatic download.
+    const domError = error as { name?: string }
+    if (domError && domError.name === "AbortError") {
+      return true
+    }
+    return false
+  }
+}
+
 export async function saveJsonFile(content: string): Promise<void> {
+  const savedWithPicker = await saveTextWithPicker(content, "filtered.json")
+  if (savedWithPicker) return
+
   const blob = new Blob([content], { type: "application/json" })
   const url = URL.createObjectURL(blob)
   const a = document.createElement("a")
@@ -98,7 +162,11 @@ export async function saveRuleSets(ruleSets: RuleSet[]): Promise<void> {
 }
 
 export async function exportRuleSetsToFile(ruleSets: RuleSet[]): Promise<void> {
-  const blob = new Blob([JSON.stringify(ruleSets, null, 2)], {
+  const text = JSON.stringify(ruleSets, null, 2)
+  const savedWithPicker = await saveTextWithPicker(text, "rule-sets.json")
+  if (savedWithPicker) return
+
+  const blob = new Blob([text], {
     type: "application/json",
   })
   const url = URL.createObjectURL(blob)
