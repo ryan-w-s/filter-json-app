@@ -1,3 +1,15 @@
 @import "tailwindcss";
 
+@layer components {
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition;
+  }
 
+  .btn-xs {
+    @apply px-2 py-0.5 text-[11px];
+  }
+
+  .input-xs {
+    @apply rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-sky-500;
+  }
+}

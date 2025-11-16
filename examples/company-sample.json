@@ -1,0 +1,167 @@
+{
+  "company": {
+    "name": "TechCorp",
+    "founded": 2010,
+    "headquarters": {
+      "address": {
+        "street": "100 Innovation Drive",
+        "city": "Silicon Valley",
+        "state": "CA",
+        "zip": "94043"
+      },
+      "coordinates": {
+        "lat": 37.4219999,
+        "lng": -122.0840575
+      }
+    },
+    "departments": [
+      {
+        "name": "Engineering",
+        "manager": {
+          "name": "Alice Johnson",
+          "id": 101,
+          "projects": [
+            {
+              "name": "Project Alpha",
+              "status": "active",
+              "team": {
+                "members": [
+                  {
+                    "name": "Bob Smith",
+                    "role": "lead",
+                    "skills": ["Python", "AWS"]
+                  },
+                  {
+                    "name": "Carol Davis",
+                    "role": "dev",
+                    "skills": {
+                      "primary": "JavaScript",
+                      "secondary": ["React", "Node"]
+                    }
+                  }
+                ],
+                "nested": {
+                  "subteam": {
+                    "focus": "frontend",
+                    "tools": {
+                      "level1": {
+                        "level2": {
+                          "level3": {
+                            "tool": "Webpack",
+                            "version": "5.0"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Marketing",
+        "manager": {
+          "name": "David Wilson",
+          "id": 102,
+          "projects": [
+            {
+              "name": "Campaign Beta",
+              "status": "planning",
+              "team": {
+                "members": [
+                  {
+                    "name": "Eve Brown",
+                    "role": "strategist",
+                    "skills": ["SEO", "Analytics"]
+                  }
+                ],
+                "nested": {
+                  "subteam": {
+                    "focus": "digital",
+                    "tools": {
+                      "level1": {
+                        "level2": {
+                          "level3": {
+                            "tool": "Google Ads",
+                            "version": "2023"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "duplicateStructure": {
+    "name": "MirrorCorp",
+    "founded": 2015,
+    "headquarters": {
+      "address": {
+        "street": "200 Echo Road",
+        "city": "Silicon Valley",
+        "state": "CA",
+        "zip": "94044"
+      },
+      "coordinates": {
+        "lat": 37.422,
+        "lng": -122.084
+      }
+    },
+    "departments": [
+      {
+        "name": "Engineering",
+        "manager": {
+          "name": "Frank Lee",
+          "id": 201,
+          "projects": [
+            {
+              "name": "Project Echo",
+              "status": "active",
+              "team": {
+                "members": [
+                  {
+                    "name": "Grace Kim",
+                    "role": "lead",
+                    "skills": ["Python", "AWS"]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0",
+    "updated": "2025-11-15",
+    "tags": ["tech", "business"],
+    "deepNest": {
+      "outer": {
+        "middle1": {
+          "inner1": {
+            "deep": {
+              "evenDeeper": "value"
+            }
+          }
+        },
+        "middle2": {
+          "inner2": {
+            "deep": {
+              "evenDeeper": "another value"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
