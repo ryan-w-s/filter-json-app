@@ -95,7 +95,7 @@
   }
 </script>
 
-<section class="flex flex-col gap-4 h-full">
+<section class="flex flex-col gap-4 h-full min-h-0">
   <div>
     <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-500">
       Filter

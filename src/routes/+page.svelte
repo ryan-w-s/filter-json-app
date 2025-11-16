@@ -5,7 +5,7 @@
 </script>
 
 <main class="h-screen bg-slate-100 text-slate-900">
-  <div class="h-full max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
+  <div class="h-full w-full max-w-[1920px] mx-auto px-4 py-3 flex flex-col gap-3">
     <header class="flex items-center justify-between">
       <div>
         <h1 class="text-lg font-semibold tracking-tight">

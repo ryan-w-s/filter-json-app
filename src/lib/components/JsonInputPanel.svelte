@@ -33,7 +33,7 @@
   }
 </script>
 
-<section class="flex flex-col gap-2 h-full">
+<section class="flex flex-col gap-2 h-full min-h-0">
   <div class="flex items-center justify-between">
     <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-500">
       Source JSON
