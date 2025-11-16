@@ -73,6 +73,25 @@ describe("filterEngine", () => {
       { id: 3, category: "a" },
     ])
   })
+
+  it("treats exists operator as true for object/array values", () => {
+    const complexData = [
+      { id: 1, meta: { nested: true } },
+      { id: 2 },
+      { id: 3, meta: [] },
+    ]
+
+    const spec: FilterSpec = {
+      conditions: [{ path: "meta", operator: "exists" }],
+    }
+
+    const { value } = applyFilterSpec(complexData as any, spec)
+    if (!Array.isArray(value)) {
+      throw new Error("Expected array value")
+    }
+    const ids = (value as { id: number }[]).map((x) => x.id)
+    expect(ids).toEqual([1, 3])
+  })
 })
 
 

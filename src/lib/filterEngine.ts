@@ -55,10 +55,15 @@ function compareValues(
 }
 
 function evaluateCondition(root: JsonValue, cond: FilterCondition): boolean {
-  const candidates = collectValuesAtPath(root, cond.path).map(toComparable)
+  const rawValues = collectValuesAtPath(root, cond.path)
+
   if (cond.operator === "exists") {
-    return candidates.some((v) => v !== undefined)
+    // For existence checks, we care only that some path resolved,
+    // regardless of whether the value is primitive, object, or array.
+    return rawValues.some((v) => v !== undefined)
   }
+
+  const candidates = rawValues.map(toComparable)
   return candidates.some((v) =>
     compareValues(v, cond.operator, cond.value ?? undefined),
   )
@@ -126,7 +131,7 @@ function applyProjection(root: JsonValue, proj: FilterProjection): JsonValue {
       )
     }
 
-    return proj.paths.reduce(
+    return proj.paths.reduce<JsonValue>(
       (current, path) => deleteAtPath(current, path),
       root,
     )
