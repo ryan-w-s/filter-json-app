@@ -39,9 +39,24 @@ pub enum ProjectionMode {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum ProjectionMatchMode {
+    Exact,
+    KeyAnywhere,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ProjectionRule {
+    pub path: JsonPath,
+    #[serde(default)]
+    pub match_mode: ProjectionMatchMode,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct FilterProjection {
     pub mode: ProjectionMode,
-    pub paths: Vec<JsonPath>,
+    #[serde(default)]
+    pub rules: Vec<ProjectionRule>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

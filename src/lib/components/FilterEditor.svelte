@@ -1,11 +1,16 @@
 <script lang="ts">
-  import type { FilterSpec, FilterCondition, FilterProjection } from "../types"
+  import type {
+    FilterSpec,
+    FilterCondition,
+    FilterProjection,
+    ProjectionRule,
+  } from "../types"
   import { appState } from "../stores/appState"
   import { onDestroy } from "svelte"
 
   let draft: FilterSpec = {
     conditions: [],
-    projection: { mode: "keep", paths: [] },
+    projection: { mode: "keep", rules: [] },
   }
 
   const unsubscribe = appState.subscribe((state) => {
@@ -51,21 +56,40 @@
       ...draft,
       projection: {
         mode,
-        paths: draft.projection?.paths ?? [],
+        rules: draft.projection?.rules ?? [],
       },
     })
   }
 
-  function updateProjectionPaths(value: string) {
-    const paths = value
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean)
+  function addProjectionRule() {
+    const next: ProjectionRule = { path: "", match: "exact" }
     updateDraft({
       ...draft,
       projection: {
         mode: draft.projection?.mode ?? "keep",
-        paths,
+        rules: [...(draft.projection?.rules ?? []), next],
+      },
+    })
+  }
+
+  function updateProjectionRule(index: number, patch: Partial<ProjectionRule>) {
+    const rules = [...(draft.projection?.rules ?? [])]
+    rules[index] = { ...rules[index], ...patch }
+    updateDraft({
+      ...draft,
+      projection: {
+        mode: draft.projection?.mode ?? "keep",
+        rules,
+      },
+    })
+  }
+
+  function removeProjectionRule(index: number) {
+    updateDraft({
+      ...draft,
+      projection: {
+        mode: draft.projection?.mode ?? "keep",
+        rules: (draft.projection?.rules ?? []).filter((_, i) => i !== index),
       },
     })
   }
@@ -172,13 +196,53 @@
         Drop paths
       </label>
     </div>
-    <input
-      class="input-xs w-full"
-      placeholder="Comma separated paths, e.g. id, price"
-      value={draft.projection?.paths.join(", ") ?? ""}
-      on:input={(e) =>
-        updateProjectionPaths((e.target as HTMLInputElement).value)}
-    />
+    <div class="space-y-2">
+      {#if draft.projection?.rules && draft.projection.rules.length > 0}
+        {#each draft.projection.rules as rule, index (index)}
+          <div class="flex items-center gap-2">
+            <input
+              class="input-xs flex-1"
+              placeholder="path or key, e.g. company.address.zip"
+              value={rule.path}
+              on:input={(e) =>
+                updateProjectionRule(index, {
+                  path: (e.target as HTMLInputElement).value,
+                })}
+            />
+            <select
+              class="input-xs w-32"
+              value={rule.match ?? "exact"}
+              on:change={(e: Event) =>
+                updateProjectionRule(index, {
+                  match: (e.target as HTMLSelectElement)
+                    .value as ProjectionRule["match"],
+                })}
+            >
+              <option value="exact">Exact path</option>
+              <option value="keyAnywhere">Key anywhere</option>
+            </select>
+            <button
+              class="btn-secondary btn-xs"
+              type="button"
+              on:click={() => removeProjectionRule(index)}
+            >
+              ✕
+            </button>
+          </div>
+        {/each}
+      {:else}
+        <p class="text-xs text-slate-400">
+          No projection rules. All fields are kept.
+        </p>
+      {/if}
+      <button
+        class="btn-secondary btn-xs"
+        type="button"
+        on:click={addProjectionRule}
+      >
+        + Field
+      </button>
+    </div>
   </div>
 </section>
 

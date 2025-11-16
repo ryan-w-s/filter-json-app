@@ -50,7 +50,7 @@ describe("filterEngine", () => {
       conditions: [{ path: "price", operator: ">", value: 10 }],
       projection: {
         mode: "keep",
-        paths: ["id"],
+        rules: [{ path: "id", match: "exact" }],
       },
     }
 
@@ -63,7 +63,7 @@ describe("filterEngine", () => {
       conditions: [{ path: "price", operator: ">", value: 10 }],
       projection: {
         mode: "drop",
-        paths: ["price"],
+        rules: [{ path: "price", match: "exact" }],
       },
     }
 
@@ -72,6 +72,60 @@ describe("filterEngine", () => {
       { id: 2, category: "b" },
       { id: 3, category: "a" },
     ])
+  })
+
+  it("drops nested fields by key anywhere", () => {
+    const nested = {
+      company: {
+        name: "TechCorp",
+        headquarters: {
+          address: {
+            street: "100 Innovation Drive",
+            city: "Silicon Valley",
+            state: "CA",
+            zip: "94043",
+          },
+        },
+        departments: [
+          {
+            name: "Engineering",
+            manager: {
+              name: "Alice Johnson",
+              zip: "99999",
+            },
+          },
+        ],
+      },
+    }
+
+    const spec: FilterSpec = {
+      projection: {
+        mode: "drop",
+        rules: [{ path: "zip", match: "keyAnywhere" }],
+      },
+    }
+
+    const { value } = applyFilterSpec(nested as unknown as unknown[], spec)
+    expect(value).toEqual({
+      company: {
+        name: "TechCorp",
+        headquarters: {
+          address: {
+            street: "100 Innovation Drive",
+            city: "Silicon Valley",
+            state: "CA",
+          },
+        },
+        departments: [
+          {
+            name: "Engineering",
+            manager: {
+              name: "Alice Johnson",
+            },
+          },
+        ],
+      },
+    })
   })
 
   it("treats exists operator as true for object/array values", () => {
@@ -85,7 +139,7 @@ describe("filterEngine", () => {
       conditions: [{ path: "meta", operator: "exists" }],
     }
 
-    const { value } = applyFilterSpec(complexData as any, spec)
+    const { value } = applyFilterSpec(complexData as unknown as { id: number; meta?: unknown }[], spec)
     if (!Array.isArray(value)) {
       throw new Error("Expected array value")
     }

@@ -30,11 +30,20 @@ export interface FilterCondition {
   value?: JsonPrimitive;
 }
 
+export type ProjectionMatchMode = "exact" | "keyAnywhere";
+
+export interface ProjectionRule {
+  /** Path or key to match against, semantics controlled by `match`. */
+  path: JsonPath;
+  /** How this rule should be matched. Defaults to `"exact"` when omitted. */
+  match?: ProjectionMatchMode;
+}
+
 export interface FilterProjection {
-  /** If true, `paths` are fields to keep; if false, `paths` are fields to drop. */
+  /** If true, fields are kept; if false, fields are dropped. */
   mode: "keep" | "drop";
-  /** Dot paths describing which fields to keep or drop. */
-  paths: JsonPath[];
+  /** Rules describing which fields to keep or drop. */
+  rules: ProjectionRule[];
 }
 
 export interface FilterSpec {

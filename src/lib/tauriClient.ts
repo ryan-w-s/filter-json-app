@@ -27,7 +27,9 @@ export async function writeClipboardText(text: string): Promise<void> {
 export async function openJsonFile(): Promise<string | null> {
   // Prefer modern File System Access API if available
   const anyWindow = window as unknown as {
-    showOpenFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle[]>
+    showOpenFilePicker?: (
+      options?: FilePickerOptions,
+    ) => Promise<FileSystemFileHandle[]>
   }
 
   if (anyWindow.showOpenFilePicker) {
@@ -40,7 +42,7 @@ export async function openJsonFile(): Promise<string | null> {
           },
         ],
         multiple: false,
-      } as any)
+      })
       const file = await handle.getFile()
       return await file.text()
     } catch {

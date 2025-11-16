@@ -5,6 +5,7 @@ import type {
   FilterCondition,
   FilterProjection,
   FilterError,
+  ProjectionRule,
 } from "./types"
 import { collectValuesAtPath, deleteAtPath } from "./jsonPath"
 
@@ -117,22 +118,55 @@ function applyConditions(
   return { value: filtered, errors }
 }
 
+function normalizeRule(rule: ProjectionRule): ProjectionRule {
+  return { match: "exact", ...rule }
+}
+
+function deleteByKeyAnywhere(root: JsonValue, key: string): JsonValue {
+  function walk(value: JsonValue): JsonValue {
+    if (Array.isArray(value)) {
+      return value.map(walk)
+    }
+
+    if (value !== null && typeof value === "object") {
+      const obj = value as Record<string, JsonValue>
+      const next: Record<string, JsonValue> = {}
+      for (const [k, v] of Object.entries(obj)) {
+        if (k === key) continue
+        next[k] = walk(v)
+      }
+      return next
+    }
+
+    return value
+  }
+
+  return walk(root)
+}
+
 function applyProjection(root: JsonValue, proj: FilterProjection): JsonValue {
-  if (!proj.paths.length) return root
+  const rules = proj.rules?.map(normalizeRule) ?? []
+  if (!rules.length) return root
 
   if (proj.mode === "drop") {
     // Support array roots by dropping fields from each element
     if (Array.isArray(root)) {
       return root.map((item) =>
-        proj.paths.reduce(
-          (current, path) => deleteAtPath(current, path),
+        rules.reduce(
+          (current, rule) =>
+            rule.match === "keyAnywhere"
+              ? deleteByKeyAnywhere(current, rule.path)
+              : deleteAtPath(current, rule.path),
           item as JsonValue,
         ),
       )
     }
 
-    return proj.paths.reduce<JsonValue>(
-      (current, path) => deleteAtPath(current, path),
+    return rules.reduce<JsonValue>(
+      (current, rule) =>
+        rule.match === "keyAnywhere"
+          ? deleteByKeyAnywhere(current, rule.path)
+          : deleteAtPath(current, rule.path),
       root,
     )
   }
@@ -141,7 +175,16 @@ function applyProjection(root: JsonValue, proj: FilterProjection): JsonValue {
   if (Array.isArray(root)) {
     return root.map((item) => {
       const obj: Record<string, JsonValue> = {}
-      for (const path of proj.paths) {
+      for (const rule of rules) {
+        if (rule.match === "keyAnywhere") {
+          const values = collectValuesAtPath(item, rule.path)
+          if (values.length > 0) {
+            obj[rule.path] = values[0]
+          }
+          continue
+        }
+
+        const path = rule.path
         // Only support top-level keys like "id" for MVP
         if (path.includes(".") || path.includes("[]")) continue
         const values = collectValuesAtPath(item, path)
@@ -155,7 +198,16 @@ function applyProjection(root: JsonValue, proj: FilterProjection): JsonValue {
 
   // Non-array root: keep specified top-level keys
   const out: Record<string, JsonValue> = {}
-  for (const path of proj.paths) {
+  for (const rule of rules) {
+    if (rule.match === "keyAnywhere") {
+      const values = collectValuesAtPath(root, rule.path)
+      if (values.length > 0) {
+        out[rule.path] = values[0]
+      }
+      continue
+    }
+
+    const path = rule.path
     if (path.includes(".") || path.includes("[]")) continue
     const values = collectValuesAtPath(root, path)
     if (values.length > 0) {
