@@ -2,6 +2,8 @@
 
 A Tauri + SvelteKit + TypeScript project to filter properties from JSON data.
 
+![Screenshot of the app](./app-screenshot.png)
+
 ## Project Purpose
 
 A minimal desktop app to filter properties from JSON data. Support:
@@ -75,7 +77,7 @@ bun run test:rust
 - **Performance**: handle large-ish JSON files without freezing the UI.
 
 
-## Working Rules for Agents
+## Working Rules
 
 - **Single source of truth**: filter semantics live in shared, well-typed utilities (no duplicated logic between front and back).
 - **Explicit contracts**: define clear Rust ↔ TypeScript interfaces for commands and data structures.
