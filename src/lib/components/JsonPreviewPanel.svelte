@@ -1,32 +1,22 @@
 <script lang="ts">
   import { previewJson } from "../stores/appState"
   import { writeClipboardText, saveJsonFile } from "../tauriClient"
-  import { onDestroy } from "svelte"
 
-  let preview: unknown = null
-  const unsubscribe = previewJson.subscribe((value) => {
-    preview = value
-  })
-
-  onDestroy(() => {
-    unsubscribe()
-  })
-
-  function prettyJson(): string {
-    if (preview == null) return ""
+  function prettyJson(value: unknown): string {
+    if (value == null) return ""
     try {
-      return JSON.stringify(preview, null, 2)
+      return JSON.stringify(value, null, 2)
     } catch {
-      return String(preview)
+      return String(value)
     }
   }
 
   async function copyToClipboard() {
-    await writeClipboardText(prettyJson())
+    await writeClipboardText(prettyJson($previewJson))
   }
 
   async function saveToFile() {
-    await saveJsonFile(prettyJson())
+    await saveJsonFile(prettyJson($previewJson))
   }
 </script>
 
@@ -45,8 +35,8 @@
     </div>
   </div>
 
-  <pre class="flex-1 font-mono text-xs rounded border border-slate-300 bg-white p-2 overflow-auto">
-{prettyJson()}
+  <pre class="flex-1 font-mono text-xs rounded border border-slate-300 bg-white text-slate-900 p-2 overflow-auto">
+{prettyJson($previewJson)}
   </pre>
 </section>
 
