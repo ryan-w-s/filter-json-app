@@ -39,7 +39,7 @@ pub enum ProjectionMode {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "camelCase")]
 pub enum ProjectionMatchMode {
     Exact,
     KeyAnywhere,
@@ -48,7 +48,8 @@ pub enum ProjectionMatchMode {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ProjectionRule {
     pub path: JsonPath,
-    #[serde(default)]
+    /// Serialized as `match` to align with the TypeScript shape.
+    #[serde(default, rename = "match")]
     pub match_mode: ProjectionMatchMode,
 }
 
